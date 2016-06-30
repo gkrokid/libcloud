@@ -15,18 +15,16 @@
 # limitations under the License.
 
 import os
-import socket
 import sys
 import ssl
 
-from mock import Mock, call, patch
+from mock import Mock, call
 
 from libcloud.test import unittest
 from libcloud.common.base import Connection
 from libcloud.common.base import LoggingConnection
 from libcloud.httplib_ssl import LibcloudBaseConnection
 from libcloud.httplib_ssl import LibcloudHTTPConnection
-from libcloud.utils.misc import retry
 
 
 class BaseConnectionClassTestCase(unittest.TestCase):
@@ -232,11 +230,12 @@ class ConnectionClassTestCase(unittest.TestCase):
         self.assertEqual(con.context, {})
 
         # Context should also be reset if a method inside request throws
-        con = Connection(timeout=1, retry_delay=0.1)
+        con = Connection()
         con.connection = Mock()
 
         con.set_context(context)
         self.assertEqual(con.context, context)
+
         con.connection.request = Mock(side_effect=ssl.SSLError())
 
         try:
@@ -278,57 +277,6 @@ class ConnectionClassTestCase(unittest.TestCase):
         # Should use --head for head requests
         cmd = con._log_curl(method='HEAD', url=url, body=body, headers=headers)
         self.assertEqual(cmd, 'curl -i --head --compress http://example.com:80/test/path')
-
-    def _raise_socket_error(self):
-        raise socket.gaierror('')
-
-    def test_retry_with_sleep(self):
-        con = Connection()
-        con.connection = Mock()
-        connect_method = 'libcloud.common.base.Connection.request'
-
-        with patch(connect_method) as mock_connect:
-            mock_connect.__name__ = 'mock_connect'
-            with self.assertRaises(socket.gaierror):
-                mock_connect.side_effect = socket.gaierror('')
-                retry_request = retry(timeout=1, retry_delay=.1,
-                                      backoff=1)
-                retry_request(con.request)(action='/')
-
-            self.assertGreater(mock_connect.call_count, 1,
-                               'Retry logic failed')
-
-    def test_retry_with_timeout(self):
-        con = Connection()
-        con.connection = Mock()
-        connect_method = 'libcloud.common.base.Connection.request'
-
-        with patch(connect_method) as mock_connect:
-            mock_connect.__name__ = 'mock_connect'
-            with self.assertRaises(socket.gaierror):
-                mock_connect.side_effect = socket.gaierror('')
-                retry_request = retry(timeout=2, retry_delay=.1,
-                                      backoff=1)
-                retry_request(con.request)(action='/')
-
-            self.assertGreater(mock_connect.call_count, 1,
-                               'Retry logic failed')
-
-    def test_retry_with_backoff(self):
-        con = Connection()
-        con.connection = Mock()
-        connect_method = 'libcloud.common.base.Connection.request'
-
-        with patch(connect_method) as mock_connect:
-            mock_connect.__name__ = 'mock_connect'
-            with self.assertRaises(socket.gaierror):
-                mock_connect.side_effect = socket.gaierror('')
-                retry_request = retry(timeout=2, retry_delay=.1,
-                                      backoff=1)
-                retry_request(con.request)(action='/')
-
-            self.assertGreater(mock_connect.call_count, 1,
-                               'Retry logic failed')
 
 if __name__ == '__main__':
     sys.exit(unittest.main())

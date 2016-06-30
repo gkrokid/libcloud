@@ -163,6 +163,7 @@ class BlueboxNodeDriver(NodeDriver):
 
     def create_node(self, **kwargs):
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+        size = kwargs["size"]
 
         name = kwargs['name']
         image = kwargs['image']

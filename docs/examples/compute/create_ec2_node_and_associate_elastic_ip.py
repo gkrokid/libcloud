@@ -7,8 +7,8 @@ SECRET_KEY = 'your secret key'
 IMAGE_ID = 'ami-c8052d8d'
 SIZE_ID = 't1.micro'
 
-cls = get_driver(Provider.EC2)
-driver = cls(ACCESS_ID, SECRET_KEY, region="us-west-1")
+cls = get_driver(Provider.EC2_US_WEST)
+driver = cls(ACCESS_ID, SECRET_KEY)
 
 sizes = driver.list_sizes()
 images = driver.list_images()

@@ -91,8 +91,7 @@ class Record(object):
     Zone record / resource.
     """
 
-    def __init__(self, id, name, type, data, zone, driver, ttl=None,
-                 extra=None):
+    def __init__(self, id, name, type, data, zone, driver, extra=None):
         """
         :param id: Record id
         :type id: ``str``
@@ -112,9 +111,6 @@ class Record(object):
         :param driver: DNSDriver instance.
         :type driver: :class:`DNSDriver`
 
-        :param ttl: Record TTL.
-        :type ttl: ``int``
-
         :param extra: (optional) Extra attributes (driver specific).
         :type extra: ``dict``
         """
@@ -124,7 +120,6 @@ class Record(object):
         self.data = data
         self.zone = zone
         self.driver = driver
-        self.ttl = ttl
         self.extra = extra or {}
 
     def update(self, name=None, type=None, data=None, extra=None):
@@ -143,11 +138,10 @@ class Record(object):
         return record_id
 
     def __repr__(self):
-        zone = self.zone.domain if self.zone.domain else self.zone.id
-        return ('<Record: zone=%s, name=%s, type=%s, data=%s, provider=%s, '
-                'ttl=%s ...>' %
-                (zone, self.name, self.type, self.data,
-                 self.driver.name, self.ttl))
+        return ('<Record: zone=%s, name=%s, type=%s, data=%s, provider=%s '
+                '...>' %
+                (self.zone.id, self.name, self.type, self.data,
+                 self.driver.name))
 
 
 class DNSDriver(BaseDriver):
@@ -172,7 +166,7 @@ class DNSDriver(BaseDriver):
         :param    secret: Secret password to be used (required)
         :type     secret: ``str``
 
-        :param    secure: Whether to use HTTPS or HTTP. Note: Some providers
+        :param    secure: Weither to use HTTPS or HTTP. Note: Some providers
                 only support HTTPS, and it is on by default.
         :type     secure: ``bool``
 
@@ -285,7 +279,7 @@ class DNSDriver(BaseDriver):
 
     def update_zone(self, zone, domain, type='master', ttl=None, extra=None):
         """
-        Update an existing zone.
+        Update en existing zone.
 
         :param zone: Zone to update.
         :type  zone: :class:`Zone`
@@ -334,7 +328,7 @@ class DNSDriver(BaseDriver):
         raise NotImplementedError(
             'create_record not implemented for this driver')
 
-    def update_record(self, record, name, type, data, extra=None):
+    def update_record(self, record, name, type, data, extra):
         """
         Update an existing record.
 

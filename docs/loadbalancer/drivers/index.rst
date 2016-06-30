@@ -1,7 +1,7 @@
 :orphan:
 
-Load Balancer Drivers Documentation
-===================================
+Load BalancerDrivers Documentation
+==================================
 
 This chapter includes links to driver (provider) specific documentation pages.
 

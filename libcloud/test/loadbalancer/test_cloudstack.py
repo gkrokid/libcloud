@@ -60,9 +60,7 @@ class CloudStackLBTests(unittest.TestCase):
 
     def test_create_balancer(self):
         members = [Member(1, '1.1.1.1', 80), Member(2, '1.1.1.2', 80)]
-        balancer = self.driver.create_balancer(
-            name='test', algorithm=Algorithm.ROUND_ROBIN,
-            members=members)
+        balancer = self.driver.create_balancer('fake', members)
         self.assertTrue(isinstance(balancer, LoadBalancer))
 
     def test_destroy_balancer(self):

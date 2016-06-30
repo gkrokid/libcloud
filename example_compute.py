@@ -16,11 +16,11 @@
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
 
-EC2 = get_driver(Provider.EC2)
+EC2 = get_driver(Provider.EC2_US_EAST)
 Rackspace = get_driver(Provider.RACKSPACE)
 
-drivers = [EC2('access key id', 'secret key', region='us-east-1'),
-           Rackspace('username', 'api key', region='iad')]
+drivers = [EC2('access key id', 'secret key'),
+           Rackspace('username', 'api key')]
 
 nodes = [driver.list_nodes() for driver in drivers]
 

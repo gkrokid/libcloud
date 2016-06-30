@@ -125,22 +125,16 @@ class AbiquoResponse(XmlResponse):
             raise InvalidCredsError(driver=self.connection.driver)
         elif self.status == httplib.FORBIDDEN:
             raise ForbiddenError(self.connection.driver)
-        elif self.status == httplib.NOT_ACCEPTABLE:
-            raise LibcloudError('Not Acceptable')
         else:
-            parsebody = self.parse_body()
-            if parsebody is not None and hasattr(parsebody, 'findall'):
-                errors = self.parse_body().findall('error')
-                # Most of the exceptions only have one error
-                raise LibcloudError(errors[0].findtext('message'))
-            else:
-                raise LibcloudError(self.body)
+            errors = self.parse_body().findall('error')
+            # Most of the exceptions only have one error
+            raise LibcloudError(errors[0].findtext('message'))
 
     def success(self):
         """
         Determine if the request was successful.
 
-        Any of the 2XX HTTP response codes are accepted as successful requests
+        Any of the 2XX HTTP response codes are accepted as successfull requests
 
         :rtype:  ``bool``
         :return: successful request or not.
@@ -153,7 +147,7 @@ class AbiquoResponse(XmlResponse):
         Determinate if async request was successful.
 
         An async_request retrieves for a task object that can be successfully
-        retrieved (self.status == OK), but the asynchronous task (the body of
+        retrieved (self.status == OK), but the asyncronous task (the body of
         the HTTP response) which we are asking for has finished with an error.
         So this method checks if the status code is 'OK' and if the task
         has finished successfully.
@@ -180,15 +174,11 @@ class AbiquoConnection(ConnectionUserAndKey, PollingConnection):
     responseCls = AbiquoResponse
 
     def __init__(self, user_id, key, secure=True, host=None, port=None,
-                 url=None, timeout=None,
-                 retry_delay=None, backoff=None, proxy_url=None):
+                 url=None, timeout=None):
         super(AbiquoConnection, self).__init__(user_id=user_id, key=key,
                                                secure=secure,
                                                host=host, port=port,
-                                               url=url, timeout=timeout,
-                                               retry_delay=retry_delay,
-                                               backoff=backoff,
-                                               proxy_url=proxy_url)
+                                               url=url, timeout=timeout)
 
         # This attribute stores data cached across multiple request
         self.cache = {}
@@ -240,13 +230,10 @@ class AbiquoConnection(ConnectionUserAndKey, PollingConnection):
         """
         accepted_request_obj = response.object
         link_poll = get_href(accepted_request_obj, 'status')
-        hdr_poll = {'Accept': 'application/vnd.abiquo.task+xml'}
 
-        # Override the 'action', 'method' and 'headers'
-        # keys of the previous dict
+        # Override just the 'action' and 'method' keys of the previous dict
         request_kwargs['action'] = link_poll
         request_kwargs['method'] = 'GET'
-        request_kwargs['headers'] = hdr_poll
         return request_kwargs
 
     def has_completed(self, response):
@@ -271,4 +258,4 @@ class ForbiddenError(LibcloudError):
 
     def __init__(self, driver):
         message = 'User has not permission to perform this task.'
-        super(ForbiddenError, self).__init__(message, driver)
+        super(LibcloudError, self).__init__(message, driver)

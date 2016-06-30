@@ -1,8 +1,7 @@
-from libcloud.compute.types import Provider
-from libcloud.compute.providers import get_driver
+from libcloud.compute.drivers.dreamhost import DreamhostConnection
 
-PROXY_URL_NO_AUTH_1 = 'http://<proxy hostname 1>:<proxy port 2>'
+PROXY_URL_NO_AUTH = 'http://<proxy hostname>:<proxy port>'
+PROXY_URL_BASIC_AUTH = 'http://<user>:<pass>@<proxy hostname>:<proxy port>'
 
-cls = get_driver(Provider.RACKSPACE)
-driver = cls('username', 'api key', region='ord',
-             http_proxy=PROXY_URL_NO_AUTH_1)
+conn = DreamhostConnection(host='dreamhost.com', port=443,
+                           timeout=None, proxy_url=PROXY_URL_NO_AUTH)

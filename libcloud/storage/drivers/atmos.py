@@ -387,7 +387,7 @@ class AtmosDriver(StorageDriver):
 
     def get_object_cdn_url(self, obj, expiry=None, use_object=False):
         """
-        Return an object CDN URL.
+        Return a object CDN URL.
 
         :param obj: Object instance
         :type  obj: :class:`Object`

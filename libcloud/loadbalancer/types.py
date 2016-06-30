@@ -18,8 +18,6 @@ __all__ = [
     "State",
     "LibcloudLBError",
     "LibcloudLBImmutableError",
-
-    "OLD_CONSTANT_TO_NEW_MAPPING"
 ]
 
 from libcloud.common.types import LibcloudError
@@ -34,34 +32,17 @@ class LibcloudLBImmutableError(LibcloudLBError):
 
 
 class Provider(object):
-    """
-    Defines for each of the supported providers
-
-    Non-Dummy drivers are sorted in alphabetical order. Please preserve this
-    ordering when adding new drivers.
-
-    :cvar ALIYUN_SLB: Aliyun SLB loadbalancer driver
-    """
-    ALIYUN_SLB = 'aliyun_slb'
-    BRIGHTBOX = 'brightbox'
-    CLOUDSTACK = 'cloudstack'
-    DIMENSIONDATA = 'dimensiondata'
-    ELB = 'elb'
-    GCE = 'gce'
+    RACKSPACE = 'rackspace'
     GOGRID = 'gogrid'
     NINEFOLD = 'ninefold'
-    RACKSPACE = 'rackspace'
-    SOFTLAYER = 'softlayer'
+    BRIGHTBOX = 'brightbox'
+    ELB = 'elb'
+    CLOUDSTACK = 'cloudstack'
+    GCE = 'gce'
 
     # Deprecated
     RACKSPACE_US = 'rackspace_us'
     RACKSPACE_UK = 'rackspace_uk'
-
-
-OLD_CONSTANT_TO_NEW_MAPPING = {
-    Provider.RACKSPACE_US: Provider.RACKSPACE,
-    Provider.RACKSPACE_UK: Provider.RACKSPACE,
-}
 
 
 class State(object):

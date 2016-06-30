@@ -21,7 +21,6 @@ __all__ = [
     'abiquo',
     'brightbox',
     'bluebox',
-    'dimensiondata',
     'dummy',
     'ec2',
     'ecp',
@@ -40,5 +39,4 @@ __all__ = [
     'vcloud',
     'voxel',
     'vpsnet',
-    'onapp',
 ]

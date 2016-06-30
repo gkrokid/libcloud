@@ -49,19 +49,21 @@ class KTUCloudNodeDriverTest(unittest.TestCase, TestCaseMixin):
         size = self.driver.list_sizes()[0]
         image = self.driver.list_images()[0]
         KTUCloudStackMockHttp.fixture_tag = 'deployfail'
-        self.assertRaises(
-            Exception,
-            self.driver.create_node,
-            name='node-name', image=image, size=size)
+        try:
+            self.driver.create_node(name='node-name', image=image, size=size)
+        except:
+            return
+        self.assertTrue(False)
 
     def test_create_node_delayed_failure(self):
         size = self.driver.list_sizes()[0]
         image = self.driver.list_images()[0]
         KTUCloudStackMockHttp.fixture_tag = 'deployfail2'
-        self.assertRaises(
-            Exception,
-            self.driver.create_node,
-            name='node-name', image=image, size=size)
+        try:
+            self.driver.create_node(name='node-name', image=image, size=size)
+        except:
+            return
+        self.assertTrue(False)
 
     def test_list_images_no_images_available(self):
         KTUCloudStackMockHttp.fixture_tag = 'notemplates'

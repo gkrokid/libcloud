@@ -16,7 +16,7 @@ id.
 To obtain a reference to this resource, Libcloud providers corresponding get
 and / or list methods.
 
-A couple of examples are shown below.
+A couple of examples are shown bellow.
 
 Example 1 - listing records for a zone with a known id
 ------------------------------------------------------
@@ -24,8 +24,7 @@ Example 1 - listing records for a zone with a known id
 .. literalinclude:: /examples/dns/list_zone_records.py
    :language: python
 
-In this example, the :func:`driver.get_zone` method call results in an HTTP
-call.
+In this example, :func:`driver.get_zone` method call results in an HTTP call.
 
 Example 2 - creating an EC2 instance with a known ``NodeSize`` and ``NodeImage`` id
 -----------------------------------------------------------------------------------
@@ -33,8 +32,8 @@ Example 2 - creating an EC2 instance with a known ``NodeSize`` and ``NodeImage``
 .. literalinclude:: /examples/compute/create_ec2_node.py
    :language: python
 
-In this example, both the :func:`driver.list_sizes` and
-:func:`driver.list_images` method calls result in HTTP calls.
+In this example, both :func:`driver.list_sizes` an :func:`driver.list_images`
+method calls result in an HTTP call.
 
 As you can see above, most of those getter methods retrieve extra information
 about the resource from the provider API and result in an HTTP request.
@@ -47,7 +46,7 @@ There are some cases when you might not want this:
 * You want to avoid holding a reference to the resource object
 
 If that is true for you, you can directly instantiate a resource with a known
-id. You can see how to do this in the examples below.
+id. You can see how to do this in the examples bellow.
 
 Example 1 - listing records for a zone with a known id
 ------------------------------------------------------

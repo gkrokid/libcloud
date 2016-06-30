@@ -57,8 +57,10 @@ class LocalTests(unittest.TestCase):
 
     def make_tmp_file(self):
         _, tmppath = tempfile.mkstemp()
-        with open(tmppath, 'wb') as fp:
-            fp.write(b'blah' * 1024)
+
+        with open(tmppath, 'w') as fp:
+            fp.write('blah' * 1024)
+
         return tmppath
 
     def remove_tmp_file(self, tmppath):
@@ -91,14 +93,14 @@ class LocalTests(unittest.TestCase):
 
     def test_objects_success(self):
         tmppath = self.make_tmp_file()
+        tmpfile = open(tmppath)
 
         container = self.driver.create_container('test3')
         obj1 = container.upload_object(tmppath, 'object1')
         obj2 = container.upload_object(tmppath, 'path/object2')
         obj3 = container.upload_object(tmppath, 'path/to/object3')
         obj4 = container.upload_object(tmppath, 'path/to/object4.ext')
-        with open(tmppath, 'rb') as tmpfile:
-            obj5 = container.upload_object_via_stream(tmpfile, 'object5')
+        obj5 = container.upload_object_via_stream(tmpfile, 'object5')
 
         objects = self.driver.list_container_objects(container=container)
         self.assertEqual(len(objects), 5)
@@ -125,6 +127,7 @@ class LocalTests(unittest.TestCase):
         self.assertEqual(len(objects), 0)
 
         container.delete()
+        tmpfile.close()
         self.remove_tmp_file(tmppath)
 
     def test_get_container_doesnt_exist(self):
@@ -303,7 +306,10 @@ class LocalTests(unittest.TestCase):
 
         self.assertTrue(hasattr(stream, '__iter__'))
 
-        data = b''.join(stream)
+        data = ''
+        for buff in stream:
+            data += buff.decode('utf-8')
+
         self.assertTrue(len(data), 4096)
 
         obj.delete()

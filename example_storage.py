@@ -18,9 +18,9 @@ from pprint import pprint
 from libcloud.storage.types import Provider
 from libcloud.storage.providers import get_driver
 
-CloudFiles = get_driver(Provider.CLOUDFILES)
+CloudFiles = get_driver(Provider.CLOUDFILES_UK)
 
-driver = CloudFiles('access key id', 'secret key', region='ord')
+driver = CloudFiles('access key id', 'secret key')
 
 containers = driver.list_containers()
 container_objects = driver.list_container_objects(containers[0])

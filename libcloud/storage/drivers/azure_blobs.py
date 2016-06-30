@@ -19,10 +19,7 @@ import base64
 import os
 import binascii
 
-try:
-    from lxml import etree as ET
-except ImportError:
-    from xml.etree import ElementTree as ET
+from xml.etree.ElementTree import Element, SubElement
 
 from libcloud.utils.py3 import PY3
 from libcloud.utils.py3 import httplib
@@ -657,7 +654,7 @@ class AzureBlobsStorageDriver(StorageDriver):
             else:
                 headers['x-ms-page-write'] = 'update'
                 headers['x-ms-range'] = 'bytes=%d-%d' % \
-                    (offset, (bytes_transferred - 1))
+                    (offset, bytes_transferred-1)
 
             # Renew lease before updating
             lease.renew()
@@ -696,10 +693,10 @@ class AzureBlobsStorageDriver(StorageDriver):
         :type upload_id: ``list``
         """
 
-        root = ET.Element('BlockList')
+        root = Element('BlockList')
 
         for block_id in chunks:
-            part = ET.SubElement(root, 'Uncommitted')
+            part = SubElement(root, 'Uncommitted')
             part.text = str(block_id)
 
         data = tostring(root)

@@ -85,16 +85,6 @@ class ProfitBricksConnection(ConnectionUserAndKey):
     api_prefix = API_VERSION
     responseCls = ProfitBricksResponse
 
-    # Supporting xml + lxml is funky :S
-    SOAPENV_NAMESPACE = 'http://schemas.xmlsoap.org/soap/envelope/'
-    SOAPENV = '{%s}' % SOAPENV_NAMESPACE
-    WS_NAMESPACE = 'http://ws.api.profitbricks.com/'
-    WS = '{%s}' % WS_NAMESPACE
-    NSMAP = {
-        'soapenv': SOAPENV_NAMESPACE,
-        'ws': WS_NAMESPACE,
-    }
-
     def add_default_headers(self, headers):
         headers['Content-Type'] = 'text/xml'
         headers['Authorization'] = 'Basic %s' % (base64.b64encode(
@@ -103,11 +93,13 @@ class ProfitBricksConnection(ConnectionUserAndKey):
         return headers
 
     def encode_data(self, data):
-        soap_env = ET.Element(self.SOAPENV + 'Envelope',
-                              self.NSMAP, **self.NSMAP)
-        ET.SubElement(soap_env, self.SOAPENV + 'Header')
-        soap_body = ET.SubElement(soap_env, self.SOAPENV + 'Body')
-        soap_req_body = ET.SubElement(soap_body, self.WS + data['action'])
+        soap_env = ET.Element('soapenv:Envelope', {
+            'xmlns:soapenv': 'http://schemas.xmlsoap.org/soap/envelope/',
+            'xmlns:ws': 'http://ws.api.profitbricks.com/'
+            })
+        ET.SubElement(soap_env, 'soapenv:Header')
+        soap_body = ET.SubElement(soap_env, 'soapenv:Body')
+        soap_req_body = ET.SubElement(soap_body, 'ws:%s' % (data['action']))
 
         if 'request' in data.keys():
             soap_req_body = ET.SubElement(soap_req_body, 'request')
@@ -256,7 +248,7 @@ class ProfitBricksNodeDriver(NodeDriver):
 
     These are instance types that match up with what other providers support.
 
-    You can configure disk size, core size, and memory size using the ``ex_``
+    You can configure disk size, core size, and memory size using the ex_
     parameters on the create_node method.
     """
 
@@ -383,10 +375,10 @@ class ProfitBricksNodeDriver(NodeDriver):
 
         return True
 
-    def create_node(self, name, image, size=None, location=None,
-                    volume=None, ex_datacenter=None, ex_internet_access=True,
-                    ex_availability_zone=None, ex_ram=None, ex_cores=None,
-                    ex_disk=None, **kwargs):
+    def create_node(self, name, image, size=None, volume=None,
+                    ex_datacenter=None, ex_internet_access=True,
+                    ex_availability_zone=None, ex_ram=None,
+                    ex_cores=None, ex_disk=None, **kwargs):
         """
         Creates a node.
 
@@ -396,10 +388,6 @@ class ProfitBricksNodeDriver(NodeDriver):
 
         :param volume: If the volume already exists then pass this in.
         :type volume: :class:`StorageVolume`
-
-        :param location: The location of the new data center
-            if one is not supplied.
-        :type location: : :class:`NodeLocation`
 
         :param ex_datacenter: If you've already created the DC then pass
                            it in.
@@ -429,10 +417,7 @@ class ProfitBricksNodeDriver(NodeDriver):
             '''
 
             'Creating a Datacenter for the node since one was not provided.'
-            new_datacenter = self._create_new_datacenter_for_node(
-                name=name,
-                location=location
-            )
+            new_datacenter = self._create_new_datacenter_for_node(name=name)
             datacenter_id = new_datacenter.id
 
             'Waiting for the Datacenter create operation to finish.'
@@ -537,7 +522,7 @@ class ProfitBricksNodeDriver(NodeDriver):
         :param node: The node you wish to destroy.
         :type volume: :class:`Node`
 
-        :param ex_remove_attached_disks: True to destroy all attached volumes.
+        :param ex_remove_attached_disks: True to destory all attached volumes.
         :type ex_remove_attached_disks: : ``bool``
 
         :rtype:     : ``bool``
@@ -739,7 +724,7 @@ class ProfitBricksNodeDriver(NodeDriver):
         """
         Stops a node.
 
-        This also deallocates the public IP space.
+        This also dealloctes the public IP space.
 
         :param node: The node you wish to halt.
         :type node: :class:`Node`
@@ -1446,17 +1431,13 @@ class ProfitBricksNodeDriver(NodeDriver):
 
         return datacenter
 
-    def _create_new_datacenter_for_node(self, name, location):
+    def _create_new_datacenter_for_node(self, name):
         """
         Creates a Datacenter for a node.
         """
         dc_name = name + '-DC'
 
-        if not location:
-            loc = 'us/las'
-        else:
-            loc = location.id
-        return self.ex_create_datacenter(name=dc_name, location=loc)
+        return self.ex_create_datacenter(name=dc_name, location='us/las')
 
     def _wait_for_storage_volume_state(self, volume, state=NodeState.RUNNING,
                                        timeout=300, interval=5):

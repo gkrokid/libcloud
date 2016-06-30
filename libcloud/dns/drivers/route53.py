@@ -189,7 +189,7 @@ class Route53DNSDriver(DNSDriver):
         self._post_changeset(zone, batch)
         id = ':'.join((self.RECORD_TYPE_MAP[type], name))
         return Record(id=id, name=name, type=type, data=data, zone=zone,
-                      driver=self, ttl=extra.get('ttl', None), extra=extra)
+                      driver=self, extra=extra)
 
     def update_record(self, record, name=None, type=None, data=None,
                       extra=None):
@@ -216,7 +216,7 @@ class Route53DNSDriver(DNSDriver):
 
         id = ':'.join((self.RECORD_TYPE_MAP[type], name))
         return Record(id=id, name=name, type=type, data=data, zone=record.zone,
-                      driver=self, ttl=extra.get('ttl', None), extra=extra)
+                      driver=self, extra=extra)
 
     def delete_record(self, record):
         try:
@@ -270,11 +270,10 @@ class Route53DNSDriver(DNSDriver):
         records = []
         for value in values:
             record = Record(id=id, name=name, type=type, data=value, zone=zone,
-                            driver=self, ttl=extra.get('ttl', None),
-                            extra=extra)
+                            driver=self, extra=extra)
             records.append(record)
 
-        return records
+        return record
 
     def ex_delete_all_records(self, zone):
         """
@@ -315,13 +314,8 @@ class Route53DNSDriver(DNSDriver):
         ET.SubElement(change, 'Action').text = 'DELETE'
 
         rrs = ET.SubElement(change, 'ResourceRecordSet')
-
-        if record.name:
-            record_name = record.name + '.' + record.zone.domain
-        else:
-            record_name = record.zone.domain
-
-        ET.SubElement(rrs, 'Name').text = record_name
+        ET.SubElement(rrs, 'Name').text = record.name + '.' + \
+            record.zone.domain
         ET.SubElement(rrs, 'Type').text = self.RECORD_TYPE_MAP[record.type]
         ET.SubElement(rrs, 'TTL').text = str(record.extra.get('ttl', '0'))
 
@@ -340,13 +334,7 @@ class Route53DNSDriver(DNSDriver):
         ET.SubElement(change, 'Action').text = 'CREATE'
 
         rrs = ET.SubElement(change, 'ResourceRecordSet')
-
-        if name:
-            record_name = name + '.' + record.zone.domain
-        else:
-            record_name = record.zone.domain
-
-        ET.SubElement(rrs, 'Name').text = record_name
+        ET.SubElement(rrs, 'Name').text = name + '.' + record.zone.domain
         ET.SubElement(rrs, 'Type').text = self.RECORD_TYPE_MAP[type]
         ET.SubElement(rrs, 'TTL').text = str(extra.get('ttl', '0'))
 
@@ -358,6 +346,7 @@ class Route53DNSDriver(DNSDriver):
         for other_record in other_records:
             rrec = ET.SubElement(rrecs, 'ResourceRecord')
             ET.SubElement(rrec, 'Value').text = other_record['data']
+
         uri = API_ROOT + 'hostedzone/' + record.zone.id + '/rrset'
         data = ET.tostring(changeset)
         self.connection.set_context({'zone_id': record.zone.id})
@@ -376,20 +365,12 @@ class Route53DNSDriver(DNSDriver):
             ET.SubElement(change, 'Action').text = action
 
             rrs = ET.SubElement(change, 'ResourceRecordSet')
-
-            if name:
-                record_name = name + '.' + zone.domain
-            else:
-                record_name = zone.domain
-
-            ET.SubElement(rrs, 'Name').text = record_name
+            ET.SubElement(rrs, 'Name').text = name + '.' + zone.domain
             ET.SubElement(rrs, 'Type').text = self.RECORD_TYPE_MAP[type_]
             ET.SubElement(rrs, 'TTL').text = str(extra.get('ttl', '0'))
 
             rrecs = ET.SubElement(rrs, 'ResourceRecords')
             rrec = ET.SubElement(rrecs, 'ResourceRecord')
-            if 'priority' in extra:
-                data = '%s %s' % (extra['priority'], data)
             ET.SubElement(rrec, 'Value').text = data
 
         uri = API_ROOT + 'hostedzone/' + zone.id + '/rrset'
@@ -481,9 +462,7 @@ class Route53DNSDriver(DNSDriver):
 
         type = self._string_to_record_type(findtext(element=elem, xpath='Type',
                                                     namespace=NAMESPACE))
-        ttl = findtext(element=elem, xpath='TTL', namespace=NAMESPACE)
-        if ttl is not None:
-            ttl = int(ttl)
+        ttl = int(findtext(element=elem, xpath='TTL', namespace=NAMESPACE))
 
         value_elem = elem.findall(
             fixxpath(xpath='ResourceRecords/ResourceRecord',
@@ -506,7 +485,7 @@ class Route53DNSDriver(DNSDriver):
 
         id = ':'.join((self.RECORD_TYPE_MAP[type], name))
         record = Record(id=id, name=name, type=type, data=data, zone=zone,
-                        driver=self, ttl=extra.get('ttl', None), extra=extra)
+                        driver=self, extra=extra)
         return record
 
     def _get_more(self, rtype, **kwargs):

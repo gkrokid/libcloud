@@ -16,7 +16,6 @@ Provider                      list containers list objects create container dele
 `Amazon S3 (us-west-1)`_      yes             no           yes              yes              yes           yes                     yes             yes                       no           
 `Amazon S3 (standard)`_       yes             no           yes              yes              yes           yes                     yes             yes                       no           
 `CloudFiles (SWIFT)`_         yes             no           yes              yes              yes           yes                     yes             yes                       no           
-`PCextreme AuroraObjects`_    yes             yes          yes              yes              yes           yes                     yes             yes                       yes
 ============================= =============== ============ ================ ================ ============= ======================= =============== ========================= =============
 
 .. _`Dummy Storage Provider`: http://example.com
@@ -34,4 +33,3 @@ Provider                      list containers list objects create container dele
 .. _`Amazon S3 (us-west-1)`: http://aws.amazon.com/s3/
 .. _`Amazon S3 (standard)`: http://aws.amazon.com/s3/
 .. _`CloudFiles (SWIFT)`: http://www.rackspace.com/
-.. _`PCextreme AuroraObjects`: https://www.pcextreme.nl/en/aurora/objects
