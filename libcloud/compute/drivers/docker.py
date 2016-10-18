@@ -209,7 +209,7 @@ class DockerNodeDriver(NodeDriver):
                 driver=self)]
         )
 
-    def list_nodes(self, show_all=True, show_host=True):
+    def list_nodes(self, show_all=True, show_host=False):
         """
         List running and stopped containers
         show_all=False will show only running containers
