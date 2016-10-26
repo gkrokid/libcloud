@@ -20,6 +20,7 @@ from __future__ import with_statement
 import datetime
 import time
 import sys
+import tempfile
 
 from libcloud.common.base import LazyObject
 from libcloud.common.google import GoogleOAuth2Credential
@@ -1106,7 +1107,7 @@ class GCENodeDriver(NodeDriver):
         self.project = project
         self.scopes = scopes
         self.credential_file = credential_file or \
-            GoogleOAuth2Credential.default_credential_file + '.' + self.project + '.' + user_id
+            tempfile.mktemp()
 
         super(GCENodeDriver, self).__init__(user_id, key, **kwargs)
 
